@@ -87,9 +87,22 @@ function populatePage() {
   colors.on("value", function(snapshot) {
     var snap = snapshot.val()
 
-    color_keys = Object.keys(snap)
+    var color_keys = Object.keys(snap)
+    var color_array = []
+
     color_keys.forEach(function(color){
-      // console.log(key)
+      color_array.push([color, snap[color]])
+    })
+    color_array.sort(function(a,b){
+      return b[1] - a[1]
+    })
+    console.log(color_array)
+
+
+    color_array.forEach(function(color_pair){
+      var color = color_pair[0]
+
+      // Make a div for the color
 
       var id = ('vote-obj-' + color)
       $('<div/>', {
