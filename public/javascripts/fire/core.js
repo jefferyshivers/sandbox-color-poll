@@ -1,47 +1,12 @@
+// core firebase stuff
 
-var database = firebase.database();
-
-// // sign in as anonymous
-
-// firebase.auth().signInAnonymously().catch(function(error) {
-//   // Handle Errors here.
-//   var errorCode = error.code;
-//   var errorMessage = error.message;
-//   // ...
-// });
-//
-// firebase.auth().onAuthStateChanged(function(user) {
-//   if (user) {
-//     // User is signed in.
-//     var isAnonymous = user.isAnonymous;
-//     var uid = user.uid;
-//     console.log('you are signed is as anonymous')
-//     // ...
-//   } else {
-//     // User is signed out.
-//     console.log('you are no longer signed in')
-//     // ...
-//   }
-//   // ...
-// });
-
-
-
+var db = firebase.database();
+var dbref = db.ref()
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// // add user to database
 
-// function writeUserData(userId, name, email, imageUrl) {
-//   firebase.database().ref('users/' + userId).set({
-//     username: name,
-//     email: email,
-//     profile_pictures : imageUrl
-//   })
-// }
-//
-// writeUserData("jefferyshivers", "Jeffery Shivers", "myemail@test.com", "http://test.com")
 
 // var testObj = {
 //   "One": "One value",
@@ -54,8 +19,6 @@ var database = firebase.database();
 // }
 //
 // submitClick()
-
-
 
 
 
@@ -80,7 +43,6 @@ var database = firebase.database();
 
 
 
-var db = firebase.database();
 var colors = db.ref('colors');
 
 function populatePage() {
@@ -96,8 +58,6 @@ function populatePage() {
     color_array.sort(function(a,b){
       return b[1] - a[1]
     })
-    console.log(color_array)
-
 
     color_array.forEach(function(color_pair){
       var color = color_pair[0]
@@ -141,6 +101,11 @@ function populatePage() {
           vote += 1
           var dbColors = firebase.database().ref('colors');
           dbColors.child(color).set(vote)
+          // set a record of this vote to the user's account
+          // - this currently doesn't actually block multiple votes
+          // - this should first be checked, then only change (and add/subtract) if different
+          var user = firebase.auth().currentUser.uid;
+          firebase.database().ref('users/' + user).child('votes').child(color).set('UP')
         });
 
       }).appendTo('#' + id);
@@ -162,6 +127,11 @@ function populatePage() {
           vote -= 1
           var dbColors = firebase.database().ref('colors');
           dbColors.child(color).set(vote)
+          // set a record of this vote to the user's account
+          // - this currently doesn't actually block multiple votes
+          // - this should first be checked, then only change (and add/subtract) if different
+          var user = firebase.auth().currentUser.uid;
+          firebase.database().ref('users/' + user).child('votes').child(color).set('DOWN')
         });
 
       }).appendTo('#' + id);
@@ -176,4 +146,3 @@ db.ref().on("child_changed", function(snapshot){
   $('#main-table').empty()
   populatePage();
 })
-
